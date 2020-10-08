@@ -22,12 +22,16 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/heading' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( 'core/quote', {
-					value: `<p>${ content }</p>`,
-					anchor,
-				} );
+			transform: ( attributes ) => {
+				return createBlock(
+					'core/quote',
+					{},
+					attributes.map( ( props ) =>
+						createBlock( 'core/heading', props )
+					)
+				);
 			},
 		},
 		{
