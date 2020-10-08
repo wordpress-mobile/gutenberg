@@ -9,6 +9,21 @@ import {
 } from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
+const toBlocksOfType = ( blocks, type ) => {
+	const result = [];
+	blocks.forEach( ( block ) => {
+		if ( type === block.name ) {
+			result.push( block );
+		} else {
+			const newBlocks = switchToBlockType( block, type );
+			if ( newBlocks ) {
+				result.push( ...newBlocks );
+			}
+		}
+	} );
+	return result.filter( Boolean );
+};
+
 const transforms = {
 	from: [
 		{
@@ -114,20 +129,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { value, citation } ) => {
-				const paragraphs = [];
-				if ( value && value !== '<p></p>' ) {
-					paragraphs.push(
-						...split(
-							create( { html: value, multilineTag: 'p' } ),
-							'\u2028'
-						).map( ( piece ) =>
-							createBlock( 'core/paragraph', {
-								content: toHTMLString( { value: piece } ),
-							} )
-						)
-					);
-				}
+			transform: ( { citation }, innerBlocks ) => {
+				const paragraphs = toBlocksOfType(
+					innerBlocks,
+					'core/paragraph'
+				);
 				if ( citation && citation !== '<p></p>' ) {
 					paragraphs.push(
 						createBlock( 'core/paragraph', {
@@ -192,23 +198,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
 			transform: ( { citation, anchor }, innerBlocks ) => {
-				const paragraphs = [];
-				innerBlocks.forEach( ( block ) => {
-					if ( 'core/paragraph' === block.name ) {
-						paragraphs.push( block );
-					} else {
-						const newBlocks = switchToBlockType(
-							block,
-							'core/paragraph'
-						);
-						if ( newBlocks ) {
-							paragraphs.push( ...newBlocks );
-						}
-					}
-				} );
-				paragraphs.filter( Boolean );
 				return createBlock( 'core/pullquote', {
-					value: serialize( paragraphs ),
+					value: serialize(
+						toBlocksOfType( innerBlocks, 'core/paragraph' )
+					),
 					citation,
 					anchor,
 				} );
