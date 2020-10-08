@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
@@ -37,12 +37,28 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation, anchor } ) =>
-				createBlock( 'core/quote', {
-					value,
-					citation,
-					anchor,
-				} ),
+			transform: ( { value, citation, anchor } ) => {
+				return createBlock(
+					'core/quote',
+					{
+						citation,
+						anchor,
+					},
+					parseWithAttributeSchema( value, {
+						type: 'array',
+						source: 'query',
+						selector: 'p',
+						query: {
+							content: {
+								type: 'string',
+								source: 'text',
+							},
+						},
+					} ).map( ( { content } ) =>
+						createBlock( 'core/paragraph', { content } )
+					)
+				);
+			},
 		},
 		{
 			type: 'prefix',
