@@ -7,7 +7,6 @@ import {
 	serialize,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
 const toBlocksOfType = ( blocks, type ) => {
 	const result = [];
@@ -154,43 +153,19 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { value, citation, ...attrs } ) => {
-				// If there is no quote content, use the citation as the
-				// content of the resulting heading. A nonexistent citation
-				// will result in an empty heading.
-				if ( value === '<p></p>' ) {
-					return createBlock( 'core/heading', {
-						content: citation,
-					} );
+			transform: ( { citation }, innerBlocks ) => {
+				const result = [];
+				result.push( ...toBlocksOfType( innerBlocks, 'core/heading' ) );
+
+				if ( citation && citation !== '<p></p>' ) {
+					result.push(
+						createBlock( 'core/heading', {
+							content: citation,
+						} )
+					);
 				}
 
-				const pieces = split(
-					create( { html: value, multilineTag: 'p' } ),
-					'\u2028'
-				);
-
-				const headingBlock = createBlock( 'core/heading', {
-					content: toHTMLString( { value: pieces[ 0 ] } ),
-				} );
-
-				if ( ! citation && pieces.length === 1 ) {
-					return headingBlock;
-				}
-
-				const quotePieces = pieces.slice( 1 );
-
-				const quoteBlock = createBlock( 'core/quote', {
-					...attrs,
-					citation,
-					value: toHTMLString( {
-						value: quotePieces.length
-							? join( pieces.slice( 1 ), '\u2028' )
-							: create(),
-						multilineTag: 'p',
-					} ),
-				} );
-
-				return [ headingBlock, quoteBlock ];
+				return result;
 			},
 		},
 
