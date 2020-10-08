@@ -63,11 +63,7 @@ const transforms = {
 		{
 			type: 'prefix',
 			prefix: '>',
-			transform: ( content ) => {
-				return createBlock( 'core/quote', {
-					value: `<p>${ content }</p>`,
-				} );
-			},
+			transform: () => createBlock( 'core/quote' ),
 		},
 		{
 			type: 'raw',
