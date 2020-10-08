@@ -11,18 +11,13 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) => {
-				return createBlock( 'core/quote', {
-					value: toHTMLString( {
-						value: join(
-							attributes.map( ( { content } ) =>
-								create( { html: content } )
-							),
-							'\u2028'
-						),
-						multilineTag: 'p',
-					} ),
-					anchor: attributes.anchor,
-				} );
+				return createBlock(
+					'core/quote',
+					{},
+					attributes.map( ( props ) =>
+						createBlock( 'core/paragraph', props )
+					)
+				);
 			},
 		},
 		{
