@@ -119,7 +119,6 @@ describe( 'Widgets screen', () => {
 		return await find( {
 			role: 'combobox',
 			name: 'Add block',
-			haspopup: 'menu',
 		} );
 	}
 
@@ -290,7 +289,6 @@ describe( 'Widgets screen', () => {
 		inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
-		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await find( {
 			role: 'searchbox',
 			name: 'Search for a block',
