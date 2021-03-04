@@ -38,12 +38,12 @@ import {
 	isInSameBlock,
 	hasInnerBlocksContext,
 	isInsideRootBlock,
-	getBlockDOMNode,
 	getBlockClientId,
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
+import { useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 export const SelectionStart = createContext();
 
@@ -271,19 +271,18 @@ export default function WritingFlow( { children } ) {
 		blockEditorStore
 	);
 
+	const selectedRef = useRef();
+
+	useBlockRef( selectedBlockClientId, selectedRef );
+
 	function onMouseDown( event ) {
 		verticalRect.current = null;
-
-		const { ownerDocument } = event.target;
 
 		// Clicking inside a selected block should exit navigation mode and block moving mode.
 		if (
 			isNavigationMode &&
 			selectedBlockClientId &&
-			isInsideRootBlock(
-				getBlockDOMNode( selectedBlockClientId, ownerDocument ),
-				event.target
-			)
+			isInsideRootBlock( selectedRef.current, event.target )
 		) {
 			setNavigationMode( false );
 		}
@@ -398,10 +397,7 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode(
-					selectedBlockClientId,
-					ownerDocument
-				);
+				const wrapper = selectedRef.current;
 
 				if ( isShift ) {
 					if ( target === wrapper ) {

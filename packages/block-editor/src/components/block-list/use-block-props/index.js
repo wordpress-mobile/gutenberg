@@ -27,7 +27,7 @@ import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
-import { useBlockNodes } from './use-block-nodes';
+import { useRegisteredBlockRefs } from './use-block-refs';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -101,7 +101,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( clientId ),
-		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),
 		useMovingAnimation( {
@@ -110,6 +109,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		...useRegisteredBlockRefs( clientId ),
 	] );
 
 	return {

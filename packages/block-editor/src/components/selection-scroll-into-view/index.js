@@ -13,28 +13,23 @@ import { getScrollContainer } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-export function useScrollSelectionIntoView( ref ) {
+export function useScrollSelectionIntoView() {
+	const ref = useRef();
 	const selectionEnd = useSelect(
 		( select ) => select( blockEditorStore ).getBlockSelectionEnd(),
 		[]
 	);
 
+	useBlockRef( selectionEnd, ref );
 	useEffect( () => {
-		if ( ! selectionEnd ) {
+		if ( ! selectionEnd || ! ref.current ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
-		const extentNode = getBlockDOMNode( selectionEnd, ownerDocument );
-
-		if ( ! extentNode ) {
-			return;
-		}
-
-		const scrollContainer = getScrollContainer( extentNode );
+		const scrollContainer = getScrollContainer( ref.current );
 
 		// If there's no scroll container, it follows that there's no scrollbar
 		// and thus there's no need to try to scroll into view.
@@ -42,7 +37,7 @@ export function useScrollSelectionIntoView( ref ) {
 			return;
 		}
 
-		scrollIntoView( extentNode, scrollContainer, {
+		scrollIntoView( ref.current, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
 	}, [ selectionEnd ] );

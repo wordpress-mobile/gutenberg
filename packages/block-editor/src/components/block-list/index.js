@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,17 +20,13 @@ import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 
-export const BlockNodes = createContext();
-export const SetBlockNodes = createContext();
-
 export default function BlockList( { className } ) {
 	const ref = useRef();
-	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
-	useScrollSelectionIntoView( ref );
+	useScrollSelectionIntoView();
 
 	return (
-		<BlockNodes.Provider value={ blockNodes }>
+		<>
 			{ insertionPoint }
 			<BlockPopover />
 			<div
@@ -40,11 +36,9 @@ export default function BlockList( { className } ) {
 					className
 				) }
 			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
+				<BlockListItems wrapperRef={ ref } />
 			</div>
-		</BlockNodes.Provider>
+		</>
 	);
 }
 

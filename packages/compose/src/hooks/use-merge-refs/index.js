@@ -36,19 +36,24 @@ export default function useMergeRefs( refs ) {
 		refs.forEach( ( ref, index ) => {
 			const previousRef = previousRefs.current[ index ];
 
-			if (
+			if ( ref && ref.hasOwnProperty( 'current' ) ) {
+				ref.current = element.current;
+			} else if (
 				typeof ref === 'function' &&
 				ref !== previousRef &&
 				didElementChange.current === false
 			) {
-				previousRef( null );
+				if ( previousRef ) {
+					previousRef( null );
+				}
+
 				ref( element.current );
 			}
 		} );
 
 		previousRefs.current = refs;
 		didElementChange.current = false;
-	}, refs );
+	}, [ refs.length, ...refs ] );
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
