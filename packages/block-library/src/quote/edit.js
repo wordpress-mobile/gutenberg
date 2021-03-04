@@ -7,14 +7,19 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	InnerBlocks,
-	RichText,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	RichText,
 } from '@wordpress/block-editor';
-import { BlockQuotation } from '@wordpress/components';
+import {
+	BlockQuotation,
+	ToolbarGroup,
+	ToolbarButton,
+} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
@@ -27,6 +32,7 @@ export default function QuoteEdit( {
 	mergedStyle,
 	clientId,
 } ) {
+	const [ withCitation, setWithCitation ] = useState( false );
 	const { align, citation } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
@@ -34,20 +40,22 @@ export default function QuoteEdit( {
 		} ),
 		style: mergedStyle,
 	} );
-
-	const { isAncestorOfSelectedBlock } = useSelect(
-		( select ) => {
-			const { hasSelectedInnerBlock } = select( 'core/block-editor' );
-
-			return {
-				isAncestorOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					true
-				),
-			};
-		},
-		[ clientId ]
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
+	const isAncestorOfSelectedBlock = useSelect( ( select ) =>
+		select( 'core/block-editor' ).hasSelectedInnerBlock( clientId )
 	);
+
+	// On mount, initialize withCitation depending on the citation value.
+	useEffect( () => {
+		if ( ! RichText.isEmpty( citation ) ) {
+			setWithCitation( true );
+		}
+	}, [] );
+
+	let shouldCitationBeVisible = ! RichText.isEmpty( citation );
+	if ( isSelected || isAncestorOfSelectedBlock ) {
+		shouldCitationBeVisible = withCitation;
+	}
 
 	return (
 		<>
@@ -58,19 +66,25 @@ export default function QuoteEdit( {
 						setAttributes( { align: nextAlign } );
 					} }
 				/>
+				<ToolbarGroup>
+					<ToolbarButton
+						isActive={ withCitation }
+						label={ __( 'Toogle citation visibility' ) }
+						onClick={ () => {
+							if ( true === withCitation ) {
+								// Reset text if it's transitioning to hidden.
+								setAttributes( { citation: '' } );
+							}
+							setWithCitation( ! withCitation );
+						} }
+					>
+						{ __( 'Add citation' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
-			<BlockQuotation { ...blockProps }>
-				<InnerBlocks
-					allowedBlocks={ [
-						'core/code',
-						'core/heading',
-						'core/list',
-						'core/paragraph',
-					] }
-				/>
-				{ ( ! RichText.isEmpty( citation ) ||
-					isSelected ||
-					isAncestorOfSelectedBlock ) && (
+			<BlockQuotation { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ shouldCitationBeVisible && (
 					<RichText
 						identifier="citation"
 						value={ citation }
