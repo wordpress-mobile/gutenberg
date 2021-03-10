@@ -834,6 +834,26 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Takes the root level settings from theme JSON and creates variables for them.
+	 *
+	 * @param array $declarations Holds the existing declarations.
+	 * @param array $settings Settings to process.
+	 *
+	 * @return array Returns the modified $declarations.
+	 */
+	private static function compute_root_vars( $declarations, $settings ) {
+		$root_values = gutenberg_experimental_get( $settings, array( 'root' ) );
+		$css_vars      = self::flatten_tree( $root_values );
+		foreach ( $css_vars as $key => $value ) {
+			$declarations[] = array(
+				'name'  => '--wp--style--' . $key,
+				'value' => $value,
+			);
+		}
+		return $declarations;
+	}
+
+	/**
 	 * Given an array of settings, it extracts the CSS Custom Properties
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
@@ -923,20 +943,23 @@ class WP_Theme_JSON {
 		if ( ! isset( $this->theme_json['settings'] ) ) {
 			return $stylesheet;
 		}
-
 		$metadata = self::get_blocks_metadata();
 		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
 			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
 				continue;
 			}
 			$selector = $metadata[ $block_selector ]['selector'];
-
 			$declarations = self::compute_preset_vars( array(), $settings );
 			$declarations = self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
+
+		// Create variables for root level settings
+		$declarations = self::compute_root_vars( array(), $this->theme_json['styles'] );
+		$stylesheet .= self::to_ruleset( ':root', $declarations );
+
 		return $stylesheet;
 	}
 
