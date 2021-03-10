@@ -12,17 +12,39 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { isRTL, _n } from '@wordpress/i18n';
-
+import { isRTL, _n, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import VisuallyHidden from '../visually-hidden';
+import { Tooltip } from '../';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
+function renderTooltipContent( events ) {
+	const needToPrune = events.length > 4;
+	const eventsToRender = needToPrune ? events.slice( 0, 3 ) : events;
+	if ( needToPrune ) {
+		eventsToRender.push( {
+			title: __( '…and more' ),
+		} );
+	}
+
+	return (
+		<div className="components-datetime__date-day-events">
+			<ul>
+				{ eventsToRender.map( ( event, ind ) => (
+					<li key={ `event-${ ind }` }>
+						{ event.title || __( 'No title' ) }
+					</li>
+				) ) }
+			</ul>
+		</div>
+	);
+}
 
 function DatePickerDay( { day, events } ) {
 	if ( ! events?.length ) {
@@ -34,22 +56,24 @@ function DatePickerDay( { day, events } ) {
 	}
 
 	return (
-		<div className="components-datetime__date__day">
-			{ day.format( 'D' ) }
-			<ul className="components-datetime__date__day-bullets">
-				{ times( Math.min( events?.length, 3 ), ( i ) => (
-					<li key={ `bullet-${ i }` }>
-						<VisuallyHidden>
-							{ _n(
-								'has one post',
-								'has some posts',
-								events.length
-							) }
-						</VisuallyHidden>
-					</li>
-				) ) }
-			</ul>
-		</div>
+		<Tooltip text={ renderTooltipContent( events ) }>
+			<div className="components-datetime__date__day">
+				{ day.format( 'D' ) }
+				<ul className="components-datetime__date__day-bullets">
+					{ times( Math.min( events?.length, 3 ), ( i ) => (
+						<li key={ `bullet-${ i }` }>
+							<VisuallyHidden>
+								{ _n(
+									'has one post',
+									'has some posts',
+									events.length
+								) }
+							</VisuallyHidden>
+						</li>
+					) ) }
+				</ul>
+			</div>
+		</Tooltip>
 	);
 }
 
@@ -59,7 +83,9 @@ class DatePicker extends Component {
 
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
-		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind( this );
+		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind(
+			this
+		);
 	}
 
 	onMonthPreviewedHandler( newMonthDate ) {
