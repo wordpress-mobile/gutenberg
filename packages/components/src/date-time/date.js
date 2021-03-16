@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
+import { times } from 'lodash';
 import moment from 'moment';
-import classnames from 'classnames';
 
 // react-dates doesn't tree-shake correctly, so we import from the individual
 // component here, to avoid including too much of the library
@@ -20,13 +20,22 @@ import { isRTL } from '@wordpress/i18n';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 function DatePickerDay( { day, events } ) {
+	if ( ! events?.length ) {
+		return (
+			<div className="components-datetime__date__day">
+				{ day.format( 'D' ) }
+			</div>
+		);
+	}
+
 	return (
-		<div
-			className={ classnames( 'components-datetime__date__day', {
-				'has-events': events?.length,
-			} ) }
-		>
-			{ day.format( 'D' ) }
+		<div className="components-datetime__date__day">
+			{ day.format( 'DD' ) }
+			<ul className="components-datetime__date__day-bullets">
+				{ times( Math.min( events?.length, 3 ), ( i ) => (
+					<li key={ `bullet-${ i }` }> </li>
+				) ) }
+			</ul>
 		</div>
 	);
 }

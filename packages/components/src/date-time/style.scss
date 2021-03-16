@@ -118,22 +118,32 @@
 	align-content: center;
 	flex-direction: column;
 	position: relative;
+}
 
-	&.has-events::before {
-		content: ' ';
+.components-datetime__date .CalendarDay .components-datetime__date__day-bullets {
+	width: 18px;
+	height: 13px;
+    display: flex;
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	margin: 0 0 0 -9px;
+	padding: 0;
+	justify-content: center;
+
+	li {
+		margin: 0 1px;
 		width: 4px;
-		height: 4px;
-		border-radius: 2px;
-		position: absolute;
-		left: 50%;
-		margin-left: -2px;
-		bottom: 0;
-		background-color: $white;
+		height: 14px;
+		padding: 0;
+		color: $white;
+		font-size: 13px;
+		list-style: disc inside;
 	}
 }
 
-.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day.has-events::before {
-	background: var(--wp-admin-theme-color);
+.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day-bullets li {
+	color: var(--wp-admin-theme-color);
 }
 
 .components-datetime__time {
