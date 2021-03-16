@@ -19,6 +19,7 @@ import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
+import { useInnerBlocksProps } from '../inner-blocks';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
@@ -28,22 +29,18 @@ export default function BlockList( { className } ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
+	const innerBlocksProps = useInnerBlocksProps( {
+		ref,
+		className: classnames( 'is-root-container', className ),
+	} );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
 			{ insertionPoint }
 			<BlockPopover />
-			<div
-				ref={ ref }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className
-				) }
-			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
-			</div>
+			<SetBlockNodes.Provider value={ setBlockNodes }>
+				<div { ...innerBlocksProps } />
+			</SetBlockNodes.Provider>
 		</BlockNodes.Provider>
 	);
 }

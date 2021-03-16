@@ -67,6 +67,10 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return;
+			}
+
 			const block = select( blockEditorStore ).getBlock( clientId );
 			const blockType = getBlockType( block.name );
 
@@ -142,6 +146,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return false;
+			}
+
 			const {
 				getBlockName,
 				isBlockSelected,
