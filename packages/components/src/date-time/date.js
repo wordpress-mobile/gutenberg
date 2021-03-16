@@ -30,7 +30,7 @@ function DatePickerDay( { day, events } ) {
 
 	return (
 		<div className="components-datetime__date__day">
-			{ day.format( 'DD' ) }
+			{ day.format( 'D' ) }
 			<ul className="components-datetime__date__day-bullets">
 				{ times( Math.min( events?.length, 3 ), ( i ) => (
 					<li key={ `bullet-${ i }` }> </li>
