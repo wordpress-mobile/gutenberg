@@ -12,7 +12,12 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
+import { isRTL, _n } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import VisuallyHidden from '../visually-hidden';
 
 /**
  * Module Constants
@@ -33,7 +38,15 @@ function DatePickerDay( { day, events } ) {
 			{ day.format( 'D' ) }
 			<ul className="components-datetime__date__day-bullets">
 				{ times( Math.min( events?.length, 3 ), ( i ) => (
-					<li key={ `bullet-${ i }` }> </li>
+					<li key={ `bullet-${ i }` }>
+						<VisuallyHidden>
+							{ _n(
+								'has one post',
+								'has some posts',
+								events.length
+							) }
+						</VisuallyHidden>
+					</li>
 				) ) }
 			</ul>
 		</div>
