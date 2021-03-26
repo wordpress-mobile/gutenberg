@@ -117,8 +117,8 @@ export function useInBetweenInserter() {
 				}
 
 				showInsertionPoint(
-					getBlockRootClientId( clientId ),
-					getBlockIndex( clientId ),
+					rootClientId,
+					getBlockIndex( clientId, rootClientId ),
 					true
 				);
 			}
