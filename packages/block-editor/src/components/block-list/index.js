@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
+import { useInBetweenInserter } from './use-in-between-inserter';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
@@ -59,7 +60,7 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			{ insertionPoint }
 			<BlockPopover />
 			<div
-				ref={ ref }
+				ref={ useMergeRefs( [ ref, useInBetweenInserter() ] ) }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
 					className,

@@ -1429,8 +1429,8 @@ export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_INSERTION_POINT':
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index } = action;
-			return { rootClientId, index };
+			const { rootClientId, index, withInserter } = action;
+			return { rootClientId, index, withInserter };
 		}
 	}
 

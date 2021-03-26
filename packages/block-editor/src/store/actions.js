@@ -638,15 +638,17 @@ export function __unstableSetInsertionPoint( rootClientId, index ) {
  * @param {?string} rootClientId Root client ID of block list in which to
  *                               insert. Use `undefined` for the root block
  *                               list.
- * @param {number} index         Index at which block should be inserted.
+ * @param {number}  index        Index at which block should be inserted.
+ * @param {boolean} withInserter Wether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index ) {
+export function showInsertionPoint( rootClientId, index, withInserter ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
+		withInserter,
 	};
 }
 
