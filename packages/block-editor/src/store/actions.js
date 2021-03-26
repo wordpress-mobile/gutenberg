@@ -635,20 +635,21 @@ export function __unstableSetInsertionPoint( rootClientId, index ) {
  *
  * Components like <Inserter> will default to inserting blocks at this point.
  *
- * @param {?string} rootClientId Root client ID of block list in which to
- *                               insert. Use `undefined` for the root block
- *                               list.
- * @param {number}  index        Index at which block should be inserted.
- * @param {boolean} withInserter Wether or not to show an inserter button.
+ * @param {?string} rootClientId      Root client ID of block list in which to
+ *                                    insert. Use `undefined` for the root block
+ *                                    list.
+ * @param {number}  index             Index at which block should be inserted.
+ * @param {Object}  __unstableOptions Wether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index, withInserter ) {
+export function showInsertionPoint( rootClientId, index, __unstableOptions ) {
+	const { __unstableWithInserter } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
-		withInserter,
+		__unstableWithInserter,
 	};
 }
 

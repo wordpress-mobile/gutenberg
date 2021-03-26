@@ -16,18 +16,21 @@ export function useInBetweenInserter() {
 		getBlockListSettings,
 		getBlockRootClientId,
 		getBlockIndex,
+		isInsertionPointVisible,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
 			getBlockListSettings: _getBlockListSettings,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			isBlockInsertionPointVisible,
 		} = select( blockEditorStore );
 		return {
 			isMultiSelecting: _isMultiSelecting(),
 			getBlockListSettings: _getBlockListSettings,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			isInsertionPointVisible: isBlockInsertionPointVisible,
 		};
 	}, [] );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
@@ -45,7 +48,9 @@ export function useInBetweenInserter() {
 						'block-editor-block-list__layout'
 					)
 				) {
-					hideInsertionPoint();
+					if ( isInsertionPointVisible() ) {
+						hideInsertionPoint();
+					}
 					return;
 				}
 
@@ -112,14 +117,16 @@ export function useInBetweenInserter() {
 						( event.clientX > elementRect.right ||
 							event.clientX < elementRect.left ) )
 				) {
-					hideInsertionPoint();
+					if ( isInsertionPointVisible() ) {
+						hideInsertionPoint();
+					}
 					return;
 				}
 
 				showInsertionPoint(
 					rootClientId,
 					getBlockIndex( clientId, rootClientId ),
-					true
+					{ __unstableWithInserter: true }
 				);
 			}
 
