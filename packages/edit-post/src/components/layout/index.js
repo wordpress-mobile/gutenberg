@@ -222,6 +222,11 @@ function Layout( { styles } ) {
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
 									shouldFocusBlock={ isMobileViewport }
+									isInserterOpened={ isInserterOpened }
+									rootClientId={
+										isInserterOpened?.rootClientId
+									}
+									index={ isInserterOpened?.index }
 								/>
 							</div>
 						</div>
