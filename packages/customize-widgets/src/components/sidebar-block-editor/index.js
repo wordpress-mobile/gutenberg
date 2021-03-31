@@ -3,7 +3,6 @@
  */
 import { useReducer, createPortal, useMemo } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockList,
 	BlockSelectionClearer,
 	ObserveTyping,
@@ -20,9 +19,9 @@ import {
 /**
  * Internal dependencies
  */
+import SidebarEditorProvider from './sidebar-editor-provider';
 import Inspector, { BlockInspectorButton } from '../inspector';
 import Header from '../header';
-import useSidebarBlockEditor from './use-sidebar-block-editor';
 import useInserter from '../inserter/use-inserter';
 
 const inspectorOpenStateReducer = ( state, action ) => {
@@ -48,7 +47,6 @@ const inspectorOpenStateReducer = ( state, action ) => {
 };
 
 export default function SidebarBlockEditor( { sidebar, inserter } ) {
-	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 	const [
 		{ open: isInspectorOpened, busy: isInspectorAnimating },
 		setInspectorOpenState,
@@ -70,12 +68,9 @@ export default function SidebarBlockEditor( { sidebar, inserter } ) {
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
+						<SidebarEditorProvider
+							sidebar={ sidebar }
 							settings={ settings }
-							useSubRegistry={ false }
 						>
 							<BlockEditorKeyboardShortcuts />
 
@@ -92,7 +87,7 @@ export default function SidebarBlockEditor( { sidebar, inserter } ) {
 									</ObserveTyping>
 								</WritingFlow>
 							</BlockSelectionClearer>
-						</BlockEditorProvider>
+						</SidebarEditorProvider>
 
 						<Popover.Slot name="block-toolbar" />
 					</div>

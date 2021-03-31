@@ -89,12 +89,12 @@ function widgetToBlock( widget ) {
 }
 
 function initState( sidebar ) {
-	const state = { blocks: [] };
+	const state = [];
 
 	for ( const widgetId of sidebar.getWidgetIds() ) {
 		const widget = sidebar.getWidget( widgetId );
 		const block = widgetToBlock( widget );
-		state.blocks.push( block );
+		state.push( block );
 	}
 
 	return state;
@@ -120,26 +120,24 @@ export default function useSidebarBlockEditor( sidebar ) {
 					const block = blockToWidget(
 						sidebar.getWidget( widgetId )
 					);
-					setState( ( lastState ) => ( {
-						blocks: [ ...lastState.blocks, block ],
-					} ) );
+					setState( ( lastState ) => [ ...lastState, block ] );
 					break;
 				}
 
 				case 'widgetRemoved': {
 					const { widgetId } = event;
-					setState( ( lastState ) => ( {
-						blocks: lastState.blocks.filter(
+					setState( ( lastState ) =>
+						lastState.filter(
 							( { attributes: { __internalWidgetId } } ) =>
 								__internalWidgetId !== widgetId
-						),
-					} ) );
+						)
+					);
 					break;
 				}
 
 				case 'widgetChanged': {
 					const { widgetId } = event;
-					const blockToUpdate = state.blocks.find(
+					const blockToUpdate = state.find(
 						( { attributes: { __internalWidgetId } } ) =>
 							__internalWidgetId === widgetId
 					);
@@ -147,11 +145,11 @@ export default function useSidebarBlockEditor( sidebar ) {
 						sidebar.getWidget( widgetId ),
 						blockToUpdate
 					);
-					setState( ( lastState ) => ( {
-						blocks: lastState.blocks.map( ( block ) =>
+					setState( ( lastState ) =>
+						lastState.map( ( block ) =>
 							block === blockToUpdate ? updatedBlock : block
-						),
-					} ) );
+						)
+					);
 					break;
 				}
 
@@ -160,107 +158,105 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 					setState( ( lastState ) => {
 						const blocksByWidgetId = keyBy(
-							lastState.blocks,
+							lastState,
 							'attributes.__internalWidgetId'
 						);
 
-						return {
-							...lastState,
-							blocks: widgetIds.map(
-								( widgetId ) => blocksByWidgetId[ widgetId ]
-							),
-						};
+						return widgetIds.map(
+							( widgetId ) => blocksByWidgetId[ widgetId ]
+						);
 					} );
 					break;
 			}
 		};
 
-		sidebar.subscribe( handler );
-		return () => sidebar.unsubscribe( handler );
+		return sidebar.subscribe( handler );
 	}, [ sidebar ] );
 
 	const onChangeBlocks = useCallback(
 		( _nextBlocks ) => {
 			ignoreIncoming.current = true;
 
-			const blocksByWidgetId = keyBy(
-				state.blocks,
-				( block ) => block.attributes.__internalWidgetId
-			);
-
-			const nextBlocks = _nextBlocks.map( ( nextBlock, index ) => {
-				if (
-					nextBlock.attributes.__internalWidgetId &&
-					nextBlock.attributes.__internalWidgetId in blocksByWidgetId
-				) {
-					const block =
-						blocksByWidgetId[
-							nextBlock.attributes.__internalWidgetId
-						];
-					if ( ! isEqual( block, nextBlock ) ) {
-						const widgetId =
-							nextBlock.attributes.__internalWidgetId;
-						const widgetToUpdate = sidebar.getWidget( widgetId );
-						const widget = blockToWidget(
-							nextBlock,
-							widgetToUpdate
-						);
-						sidebar.updateWidget( widget );
-					}
-					return nextBlock;
-				}
-
-				const widget = blockToWidget( nextBlock );
-				const widgetId = sidebar.addWidget( widget, index );
-				return {
-					...nextBlock,
-					attributes: {
-						...nextBlock.attributes,
-						__internalWidgetId: widgetId,
-					},
-				};
-			} );
-
-			const seen = nextBlocks.map(
-				( block ) => block.attributes.__internalWidgetId
-			);
-
-			for ( const block of state.blocks ) {
-				const widgetId = block.attributes.__internalWidgetId;
-				if ( ! seen.includes( widgetId ) ) {
-					sidebar.removeWidget( widgetId );
-				}
-			}
-
-			if (
-				nextBlocks.length === state.blocks.length &&
-				! isEqual(
-					nextBlocks.map(
-						( { attributes: { __internalWidgetId } } ) =>
-							__internalWidgetId
-					),
-					state.blocks.map(
-						( { attributes: { __internalWidgetId } } ) =>
-							__internalWidgetId
-					)
-				)
-			) {
-				const order = nextBlocks.map(
-					( { attributes: { __internalWidgetId } } ) =>
-						__internalWidgetId
+			setState( ( lastState ) => {
+				const blocksByWidgetId = keyBy(
+					lastState,
+					( block ) => block.attributes.__internalWidgetId
 				);
-				sidebar.setWidgetIds( order );
-			}
 
-			setState( ( lastState ) => ( {
-				...lastState,
-				blocks: nextBlocks,
-			} ) );
+				const nextBlocks = _nextBlocks.map( ( nextBlock, index ) => {
+					if (
+						nextBlock.attributes.__internalWidgetId &&
+						nextBlock.attributes.__internalWidgetId in
+							blocksByWidgetId
+					) {
+						const block =
+							blocksByWidgetId[
+								nextBlock.attributes.__internalWidgetId
+							];
+						if ( ! isEqual( block, nextBlock ) ) {
+							const widgetId =
+								nextBlock.attributes.__internalWidgetId;
+							const widgetToUpdate = sidebar.getWidget(
+								widgetId
+							);
+							const widget = blockToWidget(
+								nextBlock,
+								widgetToUpdate
+							);
+							sidebar.updateWidget( widget );
+						}
+						return nextBlock;
+					}
 
-			ignoreIncoming.current = false;
+					const widget = blockToWidget( nextBlock );
+					const widgetId = sidebar.addWidget( widget, index );
+					return {
+						...nextBlock,
+						attributes: {
+							...nextBlock.attributes,
+							__internalWidgetId: widgetId,
+						},
+					};
+				} );
+
+				const seen = nextBlocks.map(
+					( block ) => block.attributes.__internalWidgetId
+				);
+
+				for ( const block of lastState ) {
+					const widgetId = block.attributes.__internalWidgetId;
+					if ( ! seen.includes( widgetId ) ) {
+						sidebar.removeWidget( widgetId );
+					}
+				}
+
+				if (
+					nextBlocks.length === lastState.length &&
+					! isEqual(
+						nextBlocks.map(
+							( { attributes: { __internalWidgetId } } ) =>
+								__internalWidgetId
+						),
+						lastState.map(
+							( { attributes: { __internalWidgetId } } ) =>
+								__internalWidgetId
+						)
+					)
+				) {
+					const order = nextBlocks.map(
+						( { attributes: { __internalWidgetId } } ) =>
+							__internalWidgetId
+					);
+					sidebar.setWidgetIds( order );
+				}
+
+				ignoreIncoming.current = false;
+
+				return nextBlocks;
+			} );
 		},
-		[ state, sidebar ]
+		[ sidebar ]
 	);
 
-	return [ state.blocks, onChangeBlocks, onChangeBlocks ];
+	return [ state, onChangeBlocks, onChangeBlocks ];
 }
