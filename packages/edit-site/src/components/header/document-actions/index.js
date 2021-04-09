@@ -82,6 +82,7 @@ export default function DocumentActions( {
 		);
 	}
 
+	// Return feedback that the template does not seem to exist.
 	if ( ! entityTitle ) {
 		return (
 			<div className="edit-site-document-actions">
