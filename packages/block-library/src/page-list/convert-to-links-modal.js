@@ -65,10 +65,9 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				{
 					per_page: MAX_PAGE_COUNT,
 					_fields: PAGE_FIELDS,
-					// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-					// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-					// sort.
-					orderby: 'menu_order',
+					// Sorting by both menu_order and post_title ensures a stable sort and should match the order in
+					// the page list render_callback.
+					orderby: [ 'menu_order', 'title' ],
 					order: 'asc',
 				},
 			];
