@@ -8,6 +8,7 @@ import {
 	DropZoneProvider,
 	Popover,
 	Button,
+	Notice,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
@@ -217,6 +218,20 @@ function Editor( { initialSettings } ) {
 															}
 														/>
 													) }
+													{ ! template &&
+														settings?.siteUrl &&
+														entityId && (
+															<Notice
+																status="warning"
+																isDismissible={
+																	false
+																}
+															>
+																{ __(
+																	"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+																) }
+															</Notice>
+														) }
 													<KeyboardShortcuts />
 												</>
 											}
