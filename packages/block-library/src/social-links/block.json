@@ -3,6 +3,10 @@
 	"name": "core/social-links",
 	"category": "widgets",
 	"attributes": {
+		"allowedBlocks": {
+			"type": "array",
+			"default": [ "core/social-link" ]
+		},
 		"iconColor": {
 			"type": "string"
 		},
