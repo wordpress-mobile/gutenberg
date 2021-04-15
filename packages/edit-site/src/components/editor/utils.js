@@ -92,20 +92,15 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useEditorFeature( featurePath, blockName = ALL_BLOCKS_NAME ) {
+export function useEditorFeature( featurePath, blockName = ROOT_BLOCK_NAME ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );
-	return (
-		get(
-			settings,
-			`__experimentalFeatures.${ blockName }.${ featurePath }`
-		) ??
-		get(
-			settings,
-			`__experimentalFeatures.${ ALL_BLOCKS_NAME }.${ featurePath }`
-		)
-	);
+	const fullPath =
+		blockName === ROOT_BLOCK_NAME
+			? `__experimentalFeatures.${ featurePath }`
+			: `__experimentalFeatures.blocks.${ blockName }.${ featurePath }`;
+	return get( settings, fullPath );
 }
 
 export function getPresetVariable( styles, blockName, propertyName, value ) {
