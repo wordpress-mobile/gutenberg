@@ -172,8 +172,13 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				name: ROOT_BLOCK_NAME,
 			},
 			contexts,
-			getSetting: ( context, path ) =>
-				get( userStyles?.settings?.[ context ], path ),
+			getSetting: ( context, path ) => {
+				const fullPath =
+					context === ROOT_BLOCK_NAME
+						? path
+						: `blocks.${ context }.${ path }`;
+				get( userStyles?.settings, fullPath );
+			},
 			setSetting: ( context, path, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextSettings = newContent?.settings?.[ context ];
@@ -188,10 +193,13 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				const styleOrigin =
 					'user' === origin ? userStyles : mergedStyles;
 
-				const value = get(
-					styleOrigin?.styles?.[ context ],
-					STYLE_PROPERTY[ propertyName ].value
-				);
+				const path = STYLE_PROPERTY[ propertyName ].value;
+				const fullPath =
+					context === ROOT_BLOCK_NAME
+						? path
+						: `blocks.${ context }.${ path }`;
+
+				const value = get( styleOrigin?.styles, fullPath );
 				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
