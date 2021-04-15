@@ -24,8 +24,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	ALL_BLOCKS_NAME,
-	ALL_BLOCKS_SELECTOR,
 	ROOT_BLOCK_NAME,
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
@@ -83,16 +81,7 @@ const extractSupportKeys = ( supports ) => {
 };
 
 const getContexts = ( blockTypes ) => {
-	const result = {
-		[ ROOT_BLOCK_NAME ]: {
-			selector: ROOT_BLOCK_SELECTOR,
-			supports: ROOT_BLOCK_SUPPORTS,
-		},
-		[ ALL_BLOCKS_NAME ]: {
-			selector: ALL_BLOCKS_SELECTOR,
-			supports: [], // by being an empty array, the styles subtree will be ignored
-		},
-	};
+	const result = {};
 
 	// Add contexts from block metadata.
 	blockTypes.forEach( ( blockType ) => {
@@ -177,6 +166,11 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 	const nextValue = useMemo(
 		() => ( {
+			root: {
+				selector: ROOT_BLOCK_SELECTOR,
+				supports: ROOT_BLOCK_SUPPORTS,
+				name: ROOT_BLOCK_NAME,
+			},
 			contexts,
 			getSetting: ( context, path ) =>
 				get( userStyles?.settings?.[ context ], path ),
