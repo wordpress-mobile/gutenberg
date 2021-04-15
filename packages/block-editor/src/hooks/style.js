@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omitBy, startsWith } from 'lodash';
+import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -127,10 +127,20 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
-	const filteredStyle = omitKeysNotToSerialize( style, {
+	let filteredStyle = omitKeysNotToSerialize( style, {
 		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
 	} );
+
+	if (
+		getBlockSupport(
+			blockType,
+			'__experimentalSkipTypographySerialization'
+		)
+	) {
+		filteredStyle = omit( filteredStyle, TYPOGRAPHY_SUPPORT_KEYS );
+	}
+
 	props.style = {
 		...getInlineStyles( filteredStyle ),
 		...props.style,
