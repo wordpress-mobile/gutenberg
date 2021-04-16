@@ -1,3 +1,5 @@
+# A fork to only view Gutenberg Mobile git history from before the monorepo: https://github.com/WordPress/gutenberg/pull/22714
+
 # Gutenberg
 [![Build Status](https://img.shields.io/travis/com/WordPress/gutenberg/master.svg)](https://travis-ci.com/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
